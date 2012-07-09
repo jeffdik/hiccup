@@ -1,7 +1,7 @@
 (ns hiccup.page
   "Functions for setting up HTML pages."
-  (:use hiccup.core 
-        hiccup.util))
+  (:require [hiccup.core :as core]
+            [hiccup.util :as util]))
 
 (def doctype
   {:html4
@@ -33,7 +33,7 @@
   "Create a HTML 4 document with the supplied contents. The first argument
   may be an optional attribute map."
   [& contents]
-  `(html {:mode :sgml}
+  `(core/html {:mode :sgml}
      (doctype :html4)
      [:html ~@contents]))
 
@@ -47,7 +47,7 @@
   (if-not (map? options)
     `(xhtml {} ~options ~@contents)
     `(let [options# ~options]
-       (html {:mode :xml}
+       (core/html {:mode :xml}
          (xml-declaration (options# :encoding "UTF-8"))
          (doctype :xhtml-strict)
          (xhtml-tag (options# :lang) ~@contents)))))
@@ -59,12 +59,12 @@
     `(html5 {} ~options ~@contents)
     (if (options :xml?)
       `(let [options# ~options]
-         (html {:mode :xml}
+         (core/html {:mode :xml}
            (xml-declaration (options# :encoding "UTF-8"))
            (doctype :html5)
            (xhtml-tag (options# :lang) ~@contents)))
       `(let [options# ~options]
-         (html {:mode :html}
+         (core/html {:mode :html}
            (doctype :html5)
            [:html {:lang (options# :lang)} ~@contents])))))
 
@@ -72,10 +72,10 @@
   "Include a list of external javascript files."
   [& scripts]
   (for [script scripts]
-    [:script {:type "text/javascript", :src (to-uri script)}]))
+    [:script {:type "text/javascript", :src (util/to-uri script)}]))
 
 (defn include-css
   "Include a list of external stylesheet files."
   [& styles]
   (for [style styles]
-    [:link {:type "text/css", :href (to-uri style), :rel "stylesheet"}]))
+    [:link {:type "text/css", :href (util/to-uri style), :rel "stylesheet"}]))
